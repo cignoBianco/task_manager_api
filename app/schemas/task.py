@@ -1,7 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
 from uuid import UUID
 from datetime import date, datetime
+from .tag import TagRead
 
 class TaskBase(BaseModel):
     project_id: UUID
@@ -23,6 +24,12 @@ class TaskRead(TaskBase):
     predicted_duration: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    tags: list[TagRead] = []
+
+    # model_config = ConfigDict(from_attributes=True)
 
     class Config:
         orm_mode = True
+
+class TaskAddTags(BaseModel):
+    tags: List[str]

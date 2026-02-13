@@ -63,3 +63,26 @@ def delete_task(db: Session, task_id):
     db.delete(db_task)
     db.commit()
     return db_task
+
+def add_tags_to_task(db: Session, task_id: UUID, tag_names: list[str]):
+    task = db.query(Task).filter(Task.id == task_id).first()
+    if not task:
+        return None
+
+    existing_tags = {tag.name: tag for tag in task.tags}
+
+    for name in tag_names:
+        if name in existing_tags:
+            continue
+
+        tag = db.query(Tag).filter(Tag.name == name).first()
+        if not tag:
+            tag = Tag(name=name)
+            db.add(tag)
+            db.flush()
+
+        task.tags.append(tag)
+
+    db.commit()
+    db.refresh(task)
+    return task

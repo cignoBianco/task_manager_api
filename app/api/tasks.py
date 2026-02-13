@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from ..crud import task as crud_task
-from ..schemas.task import TaskCreate, TaskRead
+from ..schemas.task import TaskCreate, TaskRead, TaskAddTags
 from ..core.config.database import get_db
 from uuid import UUID
 
@@ -33,3 +33,14 @@ def delete_task(task_id: UUID, db: Session = Depends(get_db)):
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found")
     return db_task
+
+@router.post("/{task_id}/tags", response_model=TaskRead)
+def add_tags(
+    task_id: UUID,
+    payload: TaskAddTags,
+    db: Session = Depends(get_db),
+):
+    task = crud_task.add_tags_to_task(db, task_id, payload.tags)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task

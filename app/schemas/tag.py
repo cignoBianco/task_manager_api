@@ -4,6 +4,11 @@ from uuid import UUID
 class TagBase(BaseModel):
     name: str
 
+class TagRead(TagBase):
+    id: UUID
+
+    model_config = ConfigDict(from_attributes=True)
+
 class TagCreate(TagBase):
     pass
 
