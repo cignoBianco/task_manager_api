@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from ..crud import task as crud_task
 from ..schemas.task import TaskCreate, TaskRead
@@ -8,8 +8,13 @@ from uuid import UUID
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 @router.get("/", response_model=list[TaskRead])
-def list_tasks(db: Session = Depends(get_db)):
-    return crud_task.get_tasks(db)
+def list_tasks(
+    tag_ids: list[UUID] | None = Query(None),
+    skip: int = 0,
+    limit: int = Query(20, le=100),
+    db: Session = Depends(get_db),
+):
+    return crud_task.get_tasks(db, tag_ids, skip, limit)
 
 @router.post("/", response_model=TaskRead)
 def create_task(task: TaskCreate, db: Session = Depends(get_db)):

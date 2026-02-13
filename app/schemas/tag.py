@@ -1,5 +1,16 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from uuid import UUID
+
+class TagBase(BaseModel):
+    name: str
+
+class TagCreate(TagBase):
+    pass
+
+class TagResponse(TagBase):
+    id: UUID
+
+    model_config = ConfigDict(from_attributes=True)
 
 class TaskTagBase(BaseModel):
     task_id: UUID

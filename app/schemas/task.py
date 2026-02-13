@@ -13,10 +13,10 @@ class TaskBase(BaseModel):
     actual_end_date: Optional[date] = None
     status_id: Optional[UUID] = None
     priority_id: Optional[UUID] = None
-    tags: Optional[List[str]] = []
+    tags: List[UUID] = []
 
 class TaskCreate(TaskBase):
-    pass
+    tags: list[str] = []
 
 class TaskRead(TaskBase):
     id: UUID

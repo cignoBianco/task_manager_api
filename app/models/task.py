@@ -7,13 +7,8 @@ from ..core.config.database import Base
 from .task_status import TaskStatus
 from .task_priority import TaskPriority
 from .base import UUIDMixin
+from .associations import task_tags
 
-task_tags = Table(
-    "task_tags",
-    Base.metadata,
-    Column("task_id", UUID(as_uuid=True), ForeignKey("tasks.id", ondelete="CASCADE"), primary_key=True),
-    Column("tag_id", UUID(as_uuid=True), ForeignKey("tags.id", ondelete="CASCADE"), primary_key=True),
-)
 
 class Task(UUIDMixin, Base):
     __tablename__ = "tasks"

@@ -1,34 +1,27 @@
 from sqlalchemy.orm import Session
 from ..models.tag import Tag
+from uuid import UUID
 from ..schemas import TaskTagCreate, TaskTagRead
 
-def get_tags(db: Session):
-    return db.query(Tag).all()
+def create_tag(db: Session, tag_create):
+    tag = Tag(**tag_create.model_dump())
+    db.add(tag)
+    db.commit()
+    db.refresh(tag)
+    return tag
 
-def get_tag(db: Session, tag_id):
+def get_tag_by_id(db: Session, tag_id: UUID):
     return db.query(Tag).filter(Tag.id == tag_id).first()
 
-def create_tag(db: Session, tag: TaskTagCreate):
-    db_tag = Tag(**tag.dict())
-    db.add(db_tag)
-    db.commit()
-    db.refresh(db_tag)
-    return db_tag
+def get_tag_by_name(db: Session, name: str):
+    return db.query(Tag).filter(Tag.name == name).first()
 
-def update_tag(db: Session, tag_id, tag: TaskTagCreate):
-    db_tag = get_tag(db, tag_id)
-    if not db_tag:
-        return None
-    for key, value in tag.dict(exclude_unset=True).items():
-        setattr(db_tag, key, value)
-    db.commit()
-    db.refresh(db_tag)
-    return db_tag
+def get_tags(db: Session, skip: int = 0, limit: int = 20):
+    return db.query(Tag).offset(skip).limit(limit).all()
 
-def delete_tag(db: Session, tag_id):
-    db_tag = get_tag(db, tag_id)
-    if not db_tag:
-        return None
-    db.delete(db_tag)
-    db.commit()
-    return db_tag
+def delete_tag(db: Session, tag_id: UUID):
+    tag = get_tag_by_id(db, tag_id)
+    if tag:
+        db.delete(tag)
+        db.commit()
+    return tag
