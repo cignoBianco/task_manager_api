@@ -19,8 +19,10 @@ def list_tasks(
     return crud_task.get_tasks(db, tag_ids, skip, limit)
 
 @router.post("/", response_model=TaskRead)
-def create_task(task: TaskCreate, db: Session = Depends(get_db)):
-    return crud_task.create_task(db, task)
+def create_task(data: TaskCreate, db: Session = Depends(get_db)):
+
+    service = TaskService()
+    return service.create_task(db, data)
 
 @router.put("/{task_id}", response_model=TaskRead)
 def update_task(task_id: UUID, task: TaskCreate, db: Session = Depends(get_db)):
