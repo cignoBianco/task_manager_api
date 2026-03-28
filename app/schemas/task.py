@@ -33,3 +33,13 @@ class TaskRead(TaskBase):
 
 class TaskAddTags(BaseModel):
     tags: List[str]
+
+
+class TaskFilter(BaseModel):
+    project_id: Optional[UUID]
+    status_id: Optional[UUID]
+    assignee_id: Optional[UUID]
+    tags: Optional[List[str]]
+
+    limit: int = 20
+    offset: int = 0

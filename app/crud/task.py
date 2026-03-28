@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from ..models.task import Task
 from ..models.tag import Tag
 from ..schemas import TaskCreate, TaskRead
@@ -11,16 +11,19 @@ def get_tasks(
     skip: int = 0,
     limit: int = 20,
 ):
-    query = db.query(Task)
+    query = db.query(Task).options(
+        joinedload(Task.tags),
+        joinedload(Task.assignee)
+    )
 
-    if tag_ids:
-        query = (
-            query
-            .join(Task.tags)
-            .filter(Tag.id.in_(tag_ids))
-            .group_by(Task.id)
-            .having(func.count(Tag.id) == len(tag_ids))
-        )
+    # if tag_ids:
+    #     query = (
+    #         query
+    #         .join(Task.tags)
+    #         .filter(Tag.id.in_(tag_ids))
+    #         .group_by(Task.id)
+    #         .having(func.count(Tag.id) == len(tag_ids))
+    #     )
 
     return query.offset(skip).limit(limit).all()
 
@@ -86,3 +89,20 @@ def add_tags_to_task(db: Session, task_id: UUID, tag_names: list[str]):
     db.commit()
     db.refresh(task)
     return task
+
+def get_tasks_filtered(db: Session, filters):
+    query = db.query(Task)
+
+    if filters.project_id:
+        query = query.filter(Task.project_id == filters.project_id)
+
+    if filters.status_id:
+        query = query.filter(Task.status_id == filters.status_id)
+
+    if filters.assignee_id:
+        query = query.filter(Task.assignee_id == filters.assignee_id)
+
+    if filters.tags:
+        query = query.join(Task.tags).filter(Tag.name.in_(filters.tags))
+
+    return query.offset(filters.offset).limit(filters.limit).all()

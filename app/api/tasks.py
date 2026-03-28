@@ -7,7 +7,12 @@ from uuid import UUID
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
-# Todo: task get by id
+@router.get("/", response_model=list[TaskRead])
+def get_tasks(
+    filters: TaskFilter = Depends(),
+    db: Session = Depends(get_db),
+):
+    return TaskService.get_tasks(db, filters)
 
 @router.get("/", response_model=list[TaskRead])
 def list_tasks(
