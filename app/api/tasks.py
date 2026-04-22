@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from ..crud import task as crud_task
-from ..schemas.task import TaskCreate, TaskRead, TaskAddTags
+from ..schemas.task import TaskCreate, TaskRead, TaskAddTags, TaskFilter
 from ..core.config.database import get_db
+from app.services.task_service import TaskService
 from uuid import UUID
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])

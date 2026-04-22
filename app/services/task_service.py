@@ -30,7 +30,7 @@ class TaskService:
 
         return task
 
-     @staticmethod
+    @staticmethod
     def generate_tags_stub(text: str):
         if "bug" in text.lower():
             return ["bug"]
@@ -40,4 +40,4 @@ class TaskService:
 
     @staticmethod
     def get_tasks(db: Session, filters):
-        return crud.task.get_tasks_filtered(db, filters)
+        return crud_task.get_tasks_filtered(db, filters)

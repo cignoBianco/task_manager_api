@@ -36,10 +36,10 @@ class TaskAddTags(BaseModel):
 
 
 class TaskFilter(BaseModel):
-    project_id: Optional[UUID]
-    status_id: Optional[UUID]
-    assignee_id: Optional[UUID]
-    tags: Optional[List[str]]
+    project_id: Optional[UUID] = None
+    status_id: Optional[UUID] = None
+    assignee_id: Optional[UUID] = None
+    tags: Optional[List[str]] = None
 
     limit: int = 20
     offset: int = 0
