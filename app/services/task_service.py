@@ -10,7 +10,7 @@ class TaskService:
     def __init__(self):
         self.ai = AIService()
 
-    @staticmethod
+    # @staticmethod
     def create_task(self, db: Session, data):
 
         task = crud_task.create_task(db, data)

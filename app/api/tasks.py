@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from ..crud import task as crud_task
-from ..schemas.task import TaskCreate, TaskRead, TaskAddTags, TaskFilter
+from ..schemas.task import TaskCreate, TaskRead, TaskAddTags, TaskFilter, TaskUpdate
 from ..core.config.database import get_db
 from app.services.task_service import TaskService
 from uuid import UUID
@@ -31,7 +31,7 @@ def create_task(data: TaskCreate, db: Session = Depends(get_db)):
     return service.create_task(db, data)
 
 @router.put("/{task_id}", response_model=TaskRead)
-def update_task(task_id: UUID, task: TaskCreate, db: Session = Depends(get_db)):
+def update_task(task_id: UUID, task: TaskUpdate, db: Session = Depends(get_db)):
     db_task = crud_task.update_task(db, task_id, task)
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found")

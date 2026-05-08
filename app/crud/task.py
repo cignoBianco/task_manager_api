@@ -2,6 +2,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 from ..models.task import Task
 from ..models.tag import Tag
+from ..models.task_status import TaskStatus
 from ..schemas import TaskCreate, TaskRead
 from uuid import UUID
 
@@ -11,11 +12,18 @@ def get_tasks(
     skip: int = 0,
     limit: int = 20,
 ):
-    query = db.query(Task).options(
-        joinedload(Task.tags),
-        joinedload(Task.assignee)
+    # query = db.query(Task).options(
+    #     joinedload(Task.tags),
+    #     joinedload(Task.assignee)
+    # )
+    query = (
+        db.query(Task)
+        .options(
+            joinedload(Task.tags),
+            joinedload(Task.assignee),
+            joinedload(Task.status),
+        )
     )
-
     # if tag_ids:
     #     query = (
     #         query
@@ -53,7 +61,7 @@ def update_task(db: Session, task_id, task: TaskCreate):
     db_task = get_task(db, task_id)
     if not db_task:
         return None
-    for key, value in task.dict(exclude_unset=True).items():
+    for key, value in task.model_dump(exclude_unset=True).items():
         setattr(db_task, key, value)
     db.commit()
     db.refresh(db_task)
@@ -91,13 +99,27 @@ def add_tags_to_task(db: Session, task_id: UUID, tag_names: list[str]):
     return task
 
 def get_tasks_filtered(db: Session, filters):
-    query = db.query(Task)
+    query = (
+        db.query(Task)
+        .options(
+            joinedload(Task.tags),
+            joinedload(Task.assignee),
+            joinedload(Task.status),
+        )
+    )
 
     if filters.project_id:
         query = query.filter(Task.project_id == filters.project_id)
 
     if filters.status_id:
         query = query.filter(Task.status_id == filters.status_id)
+
+    if filters.status:
+        query = (
+            query
+            .join(Task.status)
+            .filter(TaskStatus.status_name.ilike(filters.status))
+        )
 
     if filters.assignee_id:
         query = query.filter(Task.assignee_id == filters.assignee_id)
